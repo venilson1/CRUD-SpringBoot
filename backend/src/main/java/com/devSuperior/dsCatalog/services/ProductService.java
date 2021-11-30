@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
+import com.devSuperior.dsCatalog.dto.CategoryDTO;
 import com.devSuperior.dsCatalog.dto.ProductDTO;
+import com.devSuperior.dsCatalog.entities.Category;
 import com.devSuperior.dsCatalog.entities.Product;
+import com.devSuperior.dsCatalog.repositories.CategoryRepository;
 import com.devSuperior.dsCatalog.repositories.ProductRepository;
 import com.devSuperior.dsCatalog.services.exceptions.DatabaseException;
 import com.devSuperior.dsCatalog.services.exceptions.ResourceNotFoundException;
@@ -25,6 +28,9 @@ public class ProductService {
 
   @Autowired
   private ProductRepository repository;
+
+  @Autowired
+  private CategoryRepository categoryRepository;
 
   @Transactional(readOnly = true)
   public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
@@ -49,7 +55,7 @@ public class ProductService {
   @Transactional
   public ProductDTO insert(ProductDTO dto) {
     Product entity = new Product();
-    // entity.setName(dto.getName());
+    copyDtoToEntity(dto, entity);
     entity = repository.save(entity);
     return new ProductDTO(entity);
   }
@@ -58,7 +64,7 @@ public class ProductService {
   public ProductDTO update(Long id, ProductDTO dto) {
     try {
       Product entity = repository.getOne(id);
-      // entity.setName(dto.getName());
+      copyDtoToEntity(dto, entity);
       entity = repository.save(entity);
       return new ProductDTO(entity);
     } catch (EntityNotFoundException e) {
@@ -76,4 +82,20 @@ public class ProductService {
     }
   }
 
+  private void copyDtoToEntity(ProductDTO dto, Product entity) {
+
+    entity.setName(dto.getName());
+    entity.setDescription(dto.getDescription());
+    entity.setDate(dto.getDate());
+    entity.setImgUrl(dto.getImgUrl());
+    entity.setPrice(dto.getPrice());
+
+    entity.getCategories().clear();
+
+    for (CategoryDTO catDto : dto.getCategories()) {
+      Category category = categoryRepository.getOne(catDto.getId());
+      entity.getCategories().add(category);
+    }
+
+  }
 }
