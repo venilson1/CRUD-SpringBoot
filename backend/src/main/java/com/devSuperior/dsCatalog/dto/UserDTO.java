@@ -1,53 +1,39 @@
-package com.devSuperior.dsCatalog.entities;
+package com.devSuperior.dsCatalog.dto;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import com.devSuperior.dsCatalog.entities.User;
 
-@Entity
-@Table(name = "tb_user")
-public class User implements Serializable {
+public class UserDTO {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String firstName;
   private String lastName;
-
-  @Column(unique = true)
   private String email;
-  private String password;
 
-  @ManyToMany(fetch = FetchType.EAGER) // quando buscar user no banco irá vim os roles
-  @JoinTable(
-  // @formatter:off
-    name = "tb_user_role", 
-    joinColumns = @JoinColumn(name = "user_id"), 
-    inverseJoinColumns = @JoinColumn(name = "role_id")
-    // @formatter:on
-  )
-  private Set<Role> roles = new HashSet<>();
+  Set<RoleDTO> roles = new HashSet<>();
 
-  public User() {
+  public UserDTO() {
   }
 
-  public User(Long id, String firstName, String lastName, String email, String password) {
+  public UserDTO(Long id, String firstName, String lastName, String email) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
-    this.password = password;
+  }
+
+  public UserDTO(User entity) {
+    id = entity.getId();
+    firstName = entity.getFirstName();
+    lastName = entity.getLastName();
+    email = entity.getEmail();
+    entity.getRoles().forEach(role -> this.roles.add(new RoleDTO(role)));
+    // na entidade vem uma lista de roles pendurada, graças ao FetchType.Eagles
+    // então aqui no usuarioDTO estamos passando essa lista pra ele
+    // pegando a lista de roles da entidade
+    // para cada item desta lista, estou adcionando na variavel roles
   }
 
   public Long getId() {
@@ -82,15 +68,7 @@ public class User implements Serializable {
     this.email = email;
   }
 
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public Set<Role> getRoles() {
+  public Set<RoleDTO> getRoles() {
     return roles;
   }
 
@@ -110,7 +88,7 @@ public class User implements Serializable {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    User other = (User) obj;
+    UserDTO other = (UserDTO) obj;
     if (id == null) {
       if (other.id != null)
         return false;
