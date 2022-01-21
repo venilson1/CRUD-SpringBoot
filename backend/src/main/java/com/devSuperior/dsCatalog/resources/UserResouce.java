@@ -5,7 +5,7 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import com.devSuperior.dsCatalog.dto.UserDTO;
-import com.devSuperior.dsCatalog.entities.UserInsertDTO;
+import com.devSuperior.dsCatalog.dto.UserInsertDTO;
 import com.devSuperior.dsCatalog.services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;

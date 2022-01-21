@@ -8,9 +8,9 @@ import javax.persistence.EntityNotFoundException;
 
 import com.devSuperior.dsCatalog.dto.RoleDTO;
 import com.devSuperior.dsCatalog.dto.UserDTO;
+import com.devSuperior.dsCatalog.dto.UserInsertDTO;
 import com.devSuperior.dsCatalog.entities.Role;
 import com.devSuperior.dsCatalog.entities.User;
-import com.devSuperior.dsCatalog.entities.UserInsertDTO;
 import com.devSuperior.dsCatalog.repositories.RoleRepository;
 import com.devSuperior.dsCatalog.repositories.UserRepository;
 import com.devSuperior.dsCatalog.services.exceptions.DatabaseException;
