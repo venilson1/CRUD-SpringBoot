@@ -1,10 +1,19 @@
 package com.devSuperior.dsCatalog.services;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.devSuperior.dsCatalog.dto.CategoryDTO;
 import com.devSuperior.dsCatalog.dto.ProductDTO;
@@ -14,14 +23,6 @@ import com.devSuperior.dsCatalog.repositories.CategoryRepository;
 import com.devSuperior.dsCatalog.repositories.ProductRepository;
 import com.devSuperior.dsCatalog.services.exceptions.DatabaseException;
 import com.devSuperior.dsCatalog.services.exceptions.ResourceNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
@@ -33,9 +34,11 @@ public class ProductService {
   private CategoryRepository categoryRepository;
 
   @Transactional(readOnly = true)
-  public Page<ProductDTO> findAllPaged(Pageable pageable) {
-    Page<Product> list = repository.findAll(pageable);
-    return list.map(el -> new ProductDTO(el));
+  public Page<ProductDTO> findAllPaged(Long categoryId, String name, Pageable pageable) {
+	  List<Category> category = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId));
+	  Page<Product> list = repository.find(category, name, pageable);
+	  repository.findProductsWithCategories(list.getContent());
+    return list.map(el -> new ProductDTO(el, el.getCategories()));
   }
 
   @Transactional(readOnly = true)
